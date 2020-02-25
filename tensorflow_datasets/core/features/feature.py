@@ -544,3 +544,24 @@ class Tensor(FeatureConnector):
           example_data.dtype, np_dtype))
     utils.assert_shape_match(example_data.shape, self._shape)
     return example_data
+
+
+def get_inner_feature_repr(feature):
+  """Utils which returns the object which should get printed in __repr__.
+
+  This is used in container features (Sequence, FeatureDict) to print scalar
+  Tensor in a less verbose way `Sequence(tf.int32)` rather than
+  `Sequence(Tensor(shape=(), dtype=tf.in32))`.
+
+  Args:
+    feature: The feature to dispaly
+
+  Returns:
+    Either the feature or it's inner value.
+  """
+  # Check equality as sub-class should be expended.
+  # Explicit tuple check as `shape=None` should be expended
+  if type(feature) == Tensor and feature.shape == ():  # pylint: disable=unidiomatic-typecheck,g-explicit-bool-comparison
+    return repr(feature.dtype)
+  else:
+    return repr(feature)
